@@ -44,7 +44,8 @@ def harris_corners(img, window_size=3, k=0.04):
     response = np.zeros((H, W))
 
     """ Your code starts here """
-    
+    ix = filters.sobel_h(img)
+    iy = filters.sobel_v(img)
     """ Your code ends here """ 
     
     return response

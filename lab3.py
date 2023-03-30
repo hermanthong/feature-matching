@@ -53,7 +53,6 @@ def harris_corners(img, window_size=3, k=0.04):
     B = convolve(ixiy, window)
     C = convolve(iy2, window)
     
-    # Compute Harris corner response
     detM = A * C - B**2
     traceM = A + C
     response = detM - k * traceM**2
@@ -79,7 +78,8 @@ def naive_descriptor(patch):
     feature = []
     
     """ Your code starts here """
-    
+    patch = (patch - np.mean(patch)) / np.std(patch)
+    feature = patch.flatten()
     """ Your code ends here """
 
     return feature
@@ -154,7 +154,24 @@ def simple_sift(patch):
     histogram = np.zeros((4,4,8))
     
     """ Your code starts here """
-    
+    gradient_x = filters.sobel_v(patch)
+    gradient_y = filters.sobel_h(patch)
+    gradient_mag = np.sqrt(gradient_x ** 2 + gradient_y ** 2)
+    gradient_ang = np.rad2deg(np.arctan2(gradient_y, gradient_x)) % 360
+
+    for i in range(patch.shape[0]):
+        for j in range(patch.shape[1]):
+            bin_no = int(np.floor(gradient_ang[i, j] / 45))
+            bin_no = 0 if bin_no == 8 else bin_no
+            vote = gradient_mag[i, j] * weights[i, j]
+
+            cell_i = int(np.floor(i / (patch.shape[0] / 4)))
+            cell_j = int(np.floor(j / (patch.shape[1] / 4)))
+
+            histogram[cell_i, cell_j, bin_no] += vote
+
+    flat_hist = histogram.flatten()
+    feature = flat_hist / np.linalg.norm(flat_hist)
     """ Your code ends here """
 
     return feature
@@ -173,7 +190,9 @@ def top_k_matches(desc1, desc2, k=2):
     match_pairs = []
     
     """ Your code starts here """
-    
+    dists = cdist(desc1, desc2, metric='euclidean')
+    top_k_idxs = np.argsort(dists, axis=1)[:, :k]
+    match_pairs = [(i, [(j, dists[i][j]) for j in top_k_idxs[i]]) for i in range(desc1.shape[0])]
     """ Your code ends here """
 
     return match_pairs
@@ -202,7 +221,9 @@ def ratio_test_match(desc1, desc2, match_threshold):
     top_2_matches = top_k_matches(desc1, desc2)
     
     """ Your code starts here """
-    
+    for i, ((m11, d11), (m12, d12)) in top_2_matches:
+        if d11 < match_threshold * d12:
+            match_pairs.append((i, m11))
     """ Your code ends here """
 
     # Modify this line as you wish

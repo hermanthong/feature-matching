@@ -78,7 +78,7 @@ def naive_descriptor(patch):
     feature = []
     
     """ Your code starts here """
-    patch = (patch - np.mean(patch)) / np.std(patch)
+    patch = (patch - np.mean(patch)) / (np.std(patch) + 0.0001)
     feature = patch.flatten()
     """ Your code ends here """
 
@@ -293,8 +293,35 @@ def compute_homography(src, dst):
         np.linalg.solve(), np.linalg.lstsq()
     '''
     h_matrix = np.eye(3, dtype=np.float64)
+    
+
   
     """ Your code starts here """
+    msx, msy = np.mean(src, axis = 0)
+    mdx, mdy = np.mean(dst, axis = 0)
+    ssx, ssy = np.std(src, axis = 0) / np.sqrt(2)
+    sdx, sdy = np.std(dst, axis = 0) / np.sqrt(2)
+    
+    Ts = np.array([[1/ssx,0,-msx/ssx],[0,1/ssy,-msy/ssy],[0,0,1]])
+    Td = np.array([[1/sdx,0,-mdx/sdx],[0,1/sdy,-mdy/sdy],[0,0,1]])
+    
+    qs = transform_homography(src, Ts)
+    qd = transform_homography(dst, Td)
+    
+    n = qs.shape[0]
+    
+    A = np.zeros((2 * n, 9))
+    for i in range(n):
+        x, y = qs[i]
+        xd, yd = qd[i]
+        A[i * 2] = np.array([-x, -y, -1, 0, 0, 0, x * xd, y * xd, xd])
+        A[i * 2 + 1] = np.array([0, 0, 0, -x, -y, -1, x * yd, y * yd, yd])
+        
+    u, s, vt = np.linalg.svd(A)
+    K = np.reshape(vt[8], (3,3))
+    
+    h_matrix = np.matmul(np.matmul(np.linalg.inv(Td), K), Ts)
+    
     
     """ Your code ends here """
 

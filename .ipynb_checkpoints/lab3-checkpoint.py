@@ -8,6 +8,7 @@ from scipy.ndimage.filters import convolve
 from scipy.ndimage import gaussian_filter
 from utils import pad, unpad
 import math
+import random
 import cv2
 _COLOR_RED = (255, 0, 0)
 _COLOR_GREEN = (0, 255, 0)
@@ -362,6 +363,27 @@ def ransac_homography(keypoints1, keypoints2, matches, sampling_ratio=0.5, n_ite
     # RANSAC iteration start
     
     """ Your code starts here """
+    distance = lambda p1, p2: np.linalg.norm(p1 - p2)
+    is_inlier = lambda p1, p2: distance(p1, p2) <= delta
+    
+    for i in range(n_iters):
+        indices = random.sample(range(N), n_samples)
+        chosen1 = np.array([matched1_unpad[j] for j in indices])
+        chosen2 = np.array([matched2_unpad[j] for j in indices])
+
+        sampleH = compute_homography(chosen1, chosen2)
+        
+        transformed = transform_homography(matched1_unpad, sampleH)
+        inliers = [j for j in range(N) if is_inlier(matched2_unpad[j], transformed[j])]
+        if len(inliers) > n_inliers:
+            n_inliers = len(inliers)
+            max_inliers = inliers
+        
+    inliers1 = matched1_unpad[max_inliers]
+    inliers2 = matched2_unpad[max_inliers]
+    H = compute_homography(inliers1, inliers2)
+    transformed = transform_homography(matched1_unpad, sampleH)
+    max_inliers = [j for j in range(N) if is_inlier(matched2_unpad[j], transformed[j])]
     
     """ Your code ends here """
     

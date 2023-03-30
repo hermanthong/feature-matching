@@ -191,8 +191,8 @@ def top_k_matches(desc1, desc2, k=2):
     
     """ Your code starts here """
     dists = cdist(desc1, desc2, metric='euclidean')
-    top_k_idxs = np.argsort(dists, axis=1)[:, :k]
-    match_pairs = [(i, [(j, dists[i][j]) for j in top_k_idxs[i]]) for i in range(desc1.shape[0])]
+    top_k = np.argsort(dists, axis=1)[:, :k]
+    match_pairs = [(i, [(j, dists[i][j]) for j in top_k[i]]) for i in range(desc1.shape[0])]
     """ Your code ends here """
 
     return match_pairs

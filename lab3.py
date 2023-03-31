@@ -504,7 +504,7 @@ def shift_sift_descriptor(desc):
             n = 4 * (3 - i) + j
             flipped[n, 0] = reshaped[o, 0]
             flipped[n, 1:] = np.flip(reshaped[o, 1:])
-    return flipped.flatten()
+    res = flipped.flatten()
     """ Your code ends here """
     
     return res
@@ -559,7 +559,7 @@ def find_symmetry_lines(matches, kps):
         k = kps[match[1]]
         m = midpoint(i, k)
         theta = angle_with_x_axis(i, k)
-        rho = m[0] * np.cos(theta) + m[1] * np.sin(theta)
+        rho = m[0] * np.cos(theta) + m[1] * np.sin(theta) -270
         rhos.append(rho)
         thetas.append(theta)
     """ Your code ends here """

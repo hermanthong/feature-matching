@@ -554,7 +554,14 @@ def find_symmetry_lines(matches, kps):
     thetas = []
     
     """ Your code starts here """
-    
+    for match in matches:
+        i = kps[match[0]]
+        k = kps[match[1]]
+        m = midpoint(i, k)
+        theta = angle_with_x_axis(i, k)
+        rho = m[0] * np.cos(theta) + m[1] * np.sin(theta)
+        rhos.append(rho)
+        thetas.append(theta)
     """ Your code ends here """
     
     return rhos, thetas
@@ -569,6 +576,17 @@ def hough_vote_mirror(matches, kps, im_shape, window=1, threshold=0.5, num_lines
     rhos, thetas = find_symmetry_lines(matches, kps)
     
     """ Your code starts here """
+    
+    find_peak_params(hspace, params_list,  window_size=1, threshold=0.5):
+    '''
+    Given a Hough space and a list of parameters range, compute the local peaks
+    aka bins whose count is larger max_bin * threshold. The local peaks are computed
+    over a space of size (2*window_size+1)^(number of parameters)
+
+    Also include the array of values corresponding to the bins, in descending order.
+    '''
+    
+    
     
     """ Your code ends here """
     

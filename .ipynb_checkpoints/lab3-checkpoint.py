@@ -496,7 +496,15 @@ def shift_sift_descriptor(desc):
     '''
     
     """ Your code starts here """
-    
+    reshaped = desc.reshape((16,8))
+    flipped = np.zeros((16,8))
+    for i in range(4):
+        for j in range(4):
+            o = 4 * i + j
+            n = 4 * (3 - i) + j
+            flipped[n, 0] = reshaped[o, 0]
+            flipped[n, 1:] = np.flip(reshaped[o, 1:])
+    return flipped.flatten()
     """ Your code ends here """
     
     return res
@@ -509,7 +517,8 @@ def create_mirror_descriptors(img):
     '''
     
     """ Your code starts here """
-    
+    kps, descs, angles, sizes = compute_cv2_descriptor(img)
+    mir_descs = np.array([shift_sift_descriptor(desc) for desc in descs])
     """ Your code ends here """
     
     return kps, descs, sizes, angles, mir_descs
@@ -526,6 +535,12 @@ def match_mirror_descriptors(descs, mirror_descs, threshold = 0.7):
 
     
     """ Your code starts here """
+         #    [(0, [(18, 0.11414082134194799), (28, 0.139670625444803)]),
+         # (1, [(2, 0.14780585099287238), (9, 0.15420019834435536)]),
+         # (2, [(64, 0.12429203239414029), (267, 0.1395765079352806)]),
+        
+    cleaned = [(i, [(j, dist) for j, dist in matches if j != i]) for i, matches in three_matches]
+    match_result = np.array([[i, matches[0][0]] for i, matches in cleaned if (matches[0][1] / matches[1][1]) < threshold])
     
     """ Your code ends here """
     

@@ -538,7 +538,7 @@ def match_mirror_descriptors(descs, mirror_descs, threshold = 0.7):
         
     cleaned = [(i, [(j, dist) for j, dist in matches if j != i]) for i, matches in three_matches]
     match_result = np.array([[i, matches[0][0]] for i, matches in cleaned if (matches[0][1] / matches[1][1]) < threshold])
-    
+
     """ Your code ends here """
     
     return match_result
@@ -593,7 +593,7 @@ def hough_vote_mirror(matches, kps, im_shape, window=1, threshold=0.5, num_lines
         A[r][t] += 1
     
     counts, ds, ts = find_peak_params(A, [distances, thetash],  window, threshold)
-    print(counts)
+
     rho_values = ds[:num_lines]
     theta_values = ts[:num_lines]
     
